@@ -30,8 +30,16 @@ import "../styles/map-builder.css";
 
 export function MapBuilderPage() {
   const { state, dispatch } = useMapStore();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { activeMapId, fetchTree } = useMapTreeStore();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.href = import.meta.env.VITE_SIGNIN_URL ?? 'https://signin.nodestra.com'
+    }
+  }, [user, loading])
+
+  if (loading || !user) return null
 
   const {
     save,
