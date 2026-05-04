@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { animated, useSpring, useTrail } from '@react-spring/web'
-import { supabase } from '../../../lib/supabase'
 
 interface Props {
   isOpen: boolean
@@ -9,9 +8,7 @@ interface Props {
 }
 
 const NAV_ITEMS = [
-  { label: 'Flight Tracker', path: '/dashboard' },
-  { label: 'Map Builder', path: '/dashboard/map' },
-  { label: 'Sign Out', path: '__signout__' },
+  { label: 'Map Builder', path: '/map' },
 ]
 
 export function NavigationOverlay({ isOpen, onClose }: Props) {
@@ -44,13 +41,9 @@ export function NavigationOverlay({ isOpen, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [isOpen, onClose])
 
-  async function handleClick(path: string) {
+  function handleClick(path: string) {
     onClose()
-    if (path === '__signout__') {
-      await supabase.auth.signOut()
-    } else {
-      navigate(path)
-    }
+    navigate(path)
   }
 
   if (!isOpen) return null
