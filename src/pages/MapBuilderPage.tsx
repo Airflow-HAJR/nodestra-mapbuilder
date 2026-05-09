@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { useMapStore } from "../features/map-builder/useMapStore";
 import { useAirportMap } from "../features/map-builder/useAirportMap";
 import { useMapTreeStore } from "../features/map-builder/useMapTreeStore";
@@ -12,6 +13,7 @@ import { NavigationOverlay } from "../features/map-builder/ui/NavigationOverlay"
 import { ToastProvider } from "../features/map-builder/ui/Toast";
 import { showToast } from "../features/map-builder/ui/toast-store";
 import { MapTreeSidebar } from "../features/map-builder/ui/MapTreeSidebar";
+import { DevAuthGate } from "../features/map-builder/ui/DevAuthGate";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../hooks/useAuth";
 import type { NodeType } from "../features/map-builder/types";
@@ -29,16 +31,34 @@ import { Slider } from "../components/ui/slider";
 import "../styles/map-builder.css";
 
 export function MapBuilderPage() {
-  const { state, dispatch } = useMapStore();
   const { user, loading } = useAuth();
-  const { activeMapId, fetchTree } = useMapTreeStore();
+  const isDev = import.meta.env.DEV;
+  const [devAccessGranted, setDevAccessGranted] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isDev && !loading && !user) {
       window.location.href = import.meta.env.VITE_SIGNIN_URL ?? 'https://signin.nodestra.com'
     }
-  }, [user, loading])
+  }, [isDev, user, loading])
 
+  if (loading) {
+    return null;
+  }
+
+  if (isDev && !devAccessGranted) {
+    return <DevAuthGate user={user} onContinue={() => setDevAccessGranted(true)} />;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  return <AuthenticatedMapBuilder user={user} />;
+}
+
+function AuthenticatedMapBuilder({ user }: { user: User }) {
+  const { state, dispatch } = useMapStore();
+  const { activeMapId, fetchTree } = useMapTreeStore();
   const {
     save,
     uploadImage,
@@ -248,8 +268,6 @@ export function MapBuilderPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [state.selectedId, state.selectedType, state.doc, state.doc.imageUrl, addPOIMenuPos, dispatch, save]);
-
-  if (loading || !user) return null
 
   return (
     <div className={`map-builder${inspectorOpen ? " inspector-open" : ""}`}>
