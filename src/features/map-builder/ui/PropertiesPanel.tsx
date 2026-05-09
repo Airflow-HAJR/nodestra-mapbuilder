@@ -487,13 +487,13 @@ function POIInspector({ poi, doc, dispatch, onClose }: { poi: POI; doc: MapDocum
       <div className="map-props-divider" />
 
       <div className="map-props-field">
-        <label>Name</label>
+        <label>{poi.type === 'gate' ? 'Gate number' : 'Name'}</label>
         <input
           ref={nameInputRef}
           className="map-props-input"
           value={poi.name}
           onChange={e => dispatch({ type: 'UPDATE_POI', id: poi.id, patch: { name: e.target.value } })}
-          placeholder={NODE_TYPE_LABELS[poi.type]}
+          placeholder={poi.type === 'gate' ? 'A12' : NODE_TYPE_LABELS[poi.type]}
         />
         {poi.type === 'gate' && (
           <span className="map-props-hint">Gate ID shown directly on the badge (e.g. A12)</span>
