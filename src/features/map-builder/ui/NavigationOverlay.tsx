@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { animated, useSpring, useTrail } from '@react-spring/web'
+import { supabase } from '../../../lib/supabase'
 
 interface Props {
   isOpen: boolean
@@ -44,6 +45,11 @@ export function NavigationOverlay({ isOpen, onClose }: Props) {
   function handleClick(path: string) {
     onClose()
     navigate(path)
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+    window.location.href = import.meta.env.VITE_SIGNIN_URL ?? 'https://signin.nodestra.com'
   }
 
   if (!isOpen) return null
@@ -94,6 +100,12 @@ export function NavigationOverlay({ isOpen, onClose }: Props) {
               </animated.button>
             )
           })}
+        </div>
+
+        <div className="nav-overlay-footer">
+          <button className="nav-overlay-close" onClick={handleSignOut}>
+            Sign out
+          </button>
         </div>
       </animated.div>
     </animated.div>
