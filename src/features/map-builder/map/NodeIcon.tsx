@@ -271,6 +271,7 @@ export function NodeIcon({
   const shadow = selected
     ? `0 0 0 2px white, 0 0 0 4.5px ${bg}, 0 4px 14px rgba(0,0,0,0.35)`
     : `inset 0 1px 0 rgba(255,255,255,0.22), 0 2px 8px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.18)`
+  const gateBorderShadow = `0 0 0 2px white, 0 0 0 4.5px ${bg}`
 
   function handleMouseDown(e: React.MouseEvent) {
     e.stopPropagation()
@@ -330,7 +331,9 @@ export function NodeIcon({
             whiteSpace: 'nowrap',
             lineHeight: 1,
             transform: selected ? 'translateY(-2px) scale(1.08)' : 'none',
-            boxShadow: shadow,
+            boxShadow: selected
+              ? `${gateBorderShadow}, 0 4px 14px rgba(0,0,0,0.35)`
+              : `${gateBorderShadow}, inset 0 1px 0 rgba(255,255,255,0.22), 0 2px 8px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.18)`,
             transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s',
           }}
         >
