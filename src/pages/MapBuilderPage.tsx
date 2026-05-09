@@ -39,8 +39,6 @@ export function MapBuilderPage() {
     }
   }, [user, loading])
 
-  if (loading || !user) return null
-
   const {
     save,
     uploadImage,
@@ -250,6 +248,8 @@ export function MapBuilderPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [state.selectedId, state.selectedType, state.doc, state.doc.imageUrl, addPOIMenuPos, dispatch, save]);
+
+  if (loading || !user) return null
 
   return (
     <div className={`map-builder${inspectorOpen ? " inspector-open" : ""}`}>
