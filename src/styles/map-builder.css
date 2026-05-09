@@ -3605,6 +3605,13 @@
     flex-shrink: 0;
 }
 
+.nav-overlay-footer {
+    position: absolute;
+    bottom: 28px;
+    left: 80px;
+    right: 80px;
+}
+
 @media (max-width: 1279px) {
     .inspector-panel {
         width: min(344px, calc(100vw - 32px));
