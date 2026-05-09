@@ -243,17 +243,6 @@ export function NodeSVGIcon({ type, size }: { type: NodeType; size: number }) {
   }
 }
 
-// Airplane icon for unnamed gates
-function PlaneIcon({ size }: { size: number }) {
-  const s = Math.round(size * 0.66)
-  return (
-    <svg viewBox="0 0 24 24" width={s} height={s} fill="currentColor"
-      style={{ display: 'block', flexShrink: 0, pointerEvents: 'none' }}>
-      <path d="M12 3c-1 0-1.7.8-1.7 2.2V8.5L3 13v2l7.3-2.1V18L8 19.3V21.5L12 20.5l4 1V19.3L13.7 18v-4.5L21 15v-2l-7.3-4.5V5.2C13.7 3.8 13 3 12 3z" />
-    </svg>
-  )
-}
-
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function NodeIcon({
@@ -274,6 +263,7 @@ export function NodeIcon({
   const baseSize   = NODE_SIZE[poi.type] ?? 22
   const size       = Math.round(baseSize * sizeScale)
   const isGate     = poi.type === 'gate'
+  const gateLabel  = isGate ? (poi.name.trim() || 'G') : ''
   const isCircle   = CIRCLE_NODES.has(poi.type)
 
   const borderRadius = isCircle ? '50%' : isGate ? '4px' : `${Math.round(size * 0.3)}px`
@@ -344,7 +334,9 @@ export function NodeIcon({
             transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s',
           }}
         >
-          <PlaneIcon size={size} />
+          <span className="node-gate-label" title={`Gate ${gateLabel}`}>
+            {gateLabel}
+          </span>
         </div>
 
       ) : (
