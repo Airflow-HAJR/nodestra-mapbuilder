@@ -18,6 +18,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../hooks/useAuth";
 import type { NodeType } from "../features/map-builder/types";
 import { detectDuplicates } from "../features/map-builder/utils/duplicateDetection";
+import { generateId, allDocIds } from "../features/map-builder/utils/generateId";
 import { AlertCircle, Search, X } from "lucide-react";
 import {
   Dialog,
@@ -213,14 +214,14 @@ function AuthenticatedMapBuilder({ user }: { user: User }) {
         const y = Math.max(0, Math.min(1, norm.y));
 
         if (clipboardType === "waypoint") {
-          const id = `waypoint-${Math.random().toString(36).substr(2, 9)}`;
+          const id = generateId("wp", allDocIds(state.doc));
           dispatch({
             type: "ADD_WAYPOINT",
             waypoint: { ...data, id, x, y, floor: state.doc.activeFloor },
           });
           showToast("Waypoint pasted");
         } else if (clipboardType === "poi") {
-          const id = `poi-${Math.random().toString(36).substr(2, 9)}`;
+          const id = generateId(data.type ?? "poi", allDocIds(state.doc));
           dispatch({
             type: "ADD_POI",
             poi: { ...data, id, x, y, floor: state.doc.activeFloor },

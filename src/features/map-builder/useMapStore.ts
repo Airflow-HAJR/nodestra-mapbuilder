@@ -4,18 +4,12 @@ import { EDGE_STYLES, PORTAL_NODE_TYPES } from './types'
 import { findNearestEdge, waypointIdFromProjection } from './utils/projection'
 import { mapTreeActions } from './useMapTreeStore'
 import { migrateToSequentialIds } from './utils/migrateIds'
+import { generateId, allDocIds } from './utils/generateId'
 
 const UNDO_LIMIT = 100
 
 function nextDocId(prefix: string, doc: MapDocument): string {
-  const allIds = [...doc.waypoints.map(w => w.id), ...doc.edges.map(e => e.id), ...doc.pois.map(p => p.id)]
-  let max = 0
-  const re = new RegExp(`^${prefix}-(\\d+)$`)
-  for (const id of allIds) {
-    const m = id.match(re)
-    if (m) max = Math.max(max, parseInt(m[1], 10))
-  }
-  return `${prefix}-${max + 1}`
+  return generateId(prefix, allDocIds(doc))
 }
 
 export function defaultDocument(): MapDocument {
@@ -148,7 +142,7 @@ function reducer(state: EditorState, action: Action) {
       // New format: waypoints/edges/pois
       const waypoints: Waypoint[] = Array.isArray(p.waypoints)
         ? (p.waypoints as Partial<Waypoint>[]).map((waypoint) => ({
-            id: waypoint.id ?? crypto.randomUUID(),
+            id: waypoint.id ?? generateId('wp', []),
             name: typeof waypoint.name === 'string' ? waypoint.name : '',
             x: typeof waypoint.x === 'number' ? waypoint.x : 0,
             y: typeof waypoint.y === 'number' ? waypoint.y : 0,
@@ -159,7 +153,7 @@ function reducer(state: EditorState, action: Action) {
         ? (p.edges as Partial<Edge>[]).map((edge) => {
             const type = edge.type && EDGE_STYLES[edge.type as EdgeType] ? edge.type as EdgeType : 'walkway'
             return {
-              id: edge.id ?? crypto.randomUUID(),
+              id: edge.id ?? generateId('edge', []),
               name: typeof edge.name === 'string' ? edge.name : '',
               from: edge.from ?? '',
               to: edge.to ?? '',
@@ -171,7 +165,7 @@ function reducer(state: EditorState, action: Action) {
         : defaults.edges
       const pois: POI[] = Array.isArray(p.pois)
         ? (p.pois as Partial<POI>[]).map((poi) => ({
-            id: poi.id ?? crypto.randomUUID(),
+            id: poi.id ?? generateId((poi.type ?? 'poi') as string, []),
             type: (poi.type ?? 'gate') as NodeType,
             name: typeof poi.name === 'string' ? poi.name : '',
             keywords: Array.isArray(poi.keywords) ? poi.keywords : [],
@@ -184,7 +178,7 @@ function reducer(state: EditorState, action: Action) {
             floor: typeof poi.floor === 'number' ? poi.floor : defaults.activeFloor,
             memberPois: Array.isArray(poi.memberPois)
               ? (poi.memberPois as Partial<MemberPoiSnapshot>[]).map(m => ({
-                  id: typeof m.id === 'string' ? m.id : crypto.randomUUID(),
+                  id: typeof m.id === 'string' ? m.id : generateId((m.type ?? 'poi') as string, []),
                   type: (m.type ?? 'gate') as NodeType,
                   name: typeof m.name === 'string' ? m.name : '',
                   keywords: Array.isArray(m.keywords) ? m.keywords : [],
