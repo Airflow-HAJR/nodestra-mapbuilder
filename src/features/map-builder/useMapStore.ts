@@ -6,6 +6,17 @@ import { mapTreeActions } from './useMapTreeStore'
 
 const UNDO_LIMIT = 100
 
+function nextDocId(prefix: string, doc: MapDocument): string {
+  const allIds = [...doc.waypoints.map(w => w.id), ...doc.edges.map(e => e.id), ...doc.pois.map(p => p.id)]
+  let max = 0
+  const re = new RegExp(`^${prefix}-(\\d+)$`)
+  for (const id of allIds) {
+    const m = id.match(re)
+    if (m) max = Math.max(max, parseInt(m[1], 10))
+  }
+  return `${prefix}-${max + 1}`
+}
+
 export function defaultDocument(): MapDocument {
   return {
     waypoints: [], edges: [], pois: [],
@@ -350,7 +361,7 @@ function reducer(state: EditorState, action: Action) {
 
       if (fromWp) {
         state.doc.edges.push({
-          id: `edge-${crypto.randomUUID()}`,
+          id: nextDocId('edge', state.doc),
           name: '',
           from: targetEdge.from,
           to: sourceId,
@@ -361,7 +372,7 @@ function reducer(state: EditorState, action: Action) {
       }
       if (toWp) {
         state.doc.edges.push({
-          id: `edge-${crypto.randomUUID()}`,
+          id: nextDocId('edge', state.doc),
           name: '',
           from: sourceId,
           to: targetEdge.to,
@@ -531,7 +542,7 @@ function reducer(state: EditorState, action: Action) {
         : null
 
       const comboPoi: POI = {
-        id: `poi-${crypto.randomUUID()}`,
+        id: nextDocId('poi', state.doc),
         type: first.type,
         name: '',
         keywords: [],
