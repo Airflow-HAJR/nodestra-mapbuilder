@@ -12,8 +12,15 @@ import { NodeIcon, NodeSVGIcon } from './NodeIcon'
 import { EdgeLayer, GhostEdge, POILinkLayer } from './EdgeLayer'
 import { AddPOIMenu } from '../ui/AddPOIMenu'
 
-function generateId(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID()}`
+function generateId(prefix: string, doc: { waypoints: { id: string }[], edges: { id: string }[], pois: { id: string }[] }): string {
+  const allIds = [...doc.waypoints.map(w => w.id), ...doc.edges.map(e => e.id), ...doc.pois.map(p => p.id)]
+  let max = 0
+  const re = new RegExp(`^${prefix}-(\\d+)$`)
+  for (const id of allIds) {
+    const m = id.match(re)
+    if (m) max = Math.max(max, parseInt(m[1], 10))
+  }
+  return `${prefix}-${max + 1}`
 }
 
 interface Props {
@@ -204,7 +211,7 @@ export function ImageCanvas({
           pendingEdgeWpRef.current = null
         } else {
           // Create new waypoint and track it for possible revert on Escape
-          const wpId = generateId('wp')
+          const wpId = generateId('wp', doc)
           dispatch({
             type: 'ADD_WAYPOINT',
             waypoint: { id: wpId, name: '', x, y, floor: doc.activeFloor },
@@ -221,7 +228,7 @@ export function ImageCanvas({
 
         // Check if snapped to edge first
         if (edgeSnapTarget) {
-          toWpId = generateId('wp')
+          toWpId = generateId('wp', doc)
           toWpPos = { x: edgeSnapTarget.x, y: edgeSnapTarget.y }
           dispatch({
             type: 'ADD_WAYPOINT',
@@ -237,7 +244,7 @@ export function ImageCanvas({
             toWpId = targetWp.id
             toWpPos = { x: targetWp.x, y: targetWp.y }
           } else {
-            toWpId = generateId('wp')
+            toWpId = generateId('wp', doc)
             toWpPos = { x, y }
             dispatch({
               type: 'ADD_WAYPOINT',
@@ -258,7 +265,7 @@ export function ImageCanvas({
           }
 
           if (fromWpPos) {
-            const edgeId = generateId('edge')
+            const edgeId = generateId('edge', doc)
             const weight = edgeWeight(
               { x: fromWpPos.x, y: fromWpPos.y, id: edgeSource, name: '', floor: doc.activeFloor },
               { x: toWpPos.x, y: toWpPos.y, id: toWpId, name: '', floor: doc.activeFloor },
@@ -292,7 +299,7 @@ export function ImageCanvas({
     }
 
     if (activeTool === 'add-waypoint' && doc.imageUrl) {
-      const id = generateId('wp')
+      const id = generateId('wp', doc)
       dispatch({
         type: 'ADD_WAYPOINT',
         waypoint: { id, name: '', x, y, floor: doc.activeFloor },
@@ -302,7 +309,7 @@ export function ImageCanvas({
     }
 
     if (activeTool === 'add-poi' && doc.imageUrl) {
-      const id = generateId(activeNodeType)
+      const id = generateId(activeNodeType, doc)
       dispatch({
         type: 'ADD_POI',
         poi: {
@@ -408,7 +415,7 @@ export function ImageCanvas({
         const from = doc.waypoints.find(w => w.id === edgeSource)
         const to = doc.waypoints.find(w => w.id === wpId)
         if (from && to) {
-          const edgeId = generateId('edge')
+          const edgeId = generateId('edge', doc)
           dispatch({
             type: 'ADD_EDGE',
             edge: {
@@ -1078,7 +1085,7 @@ export function ImageCanvas({
             const norm = clientToNorm(addPOIMenuPos.screenX, addPOIMenuPos.screenY)
             const x = Math.max(0, Math.min(1, norm.x))
             const y = Math.max(0, Math.min(1, norm.y))
-            const id = generateId(type)
+            const id = generateId(type, doc)
             dispatch({
               type: 'ADD_POI',
               poi: {
