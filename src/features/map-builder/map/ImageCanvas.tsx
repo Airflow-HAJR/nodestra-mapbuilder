@@ -11,16 +11,10 @@ import { supabase } from '../../../lib/supabase'
 import { NodeIcon, NodeSVGIcon } from './NodeIcon'
 import { EdgeLayer, GhostEdge, POILinkLayer } from './EdgeLayer'
 import { AddPOIMenu } from '../ui/AddPOIMenu'
+import { generateId as _generateId, allDocIds } from '../utils/generateId'
 
 function generateId(prefix: string, doc: { waypoints: { id: string }[], edges: { id: string }[], pois: { id: string }[] }): string {
-  const allIds = [...doc.waypoints.map(w => w.id), ...doc.edges.map(e => e.id), ...doc.pois.map(p => p.id)]
-  let max = 0
-  const re = new RegExp(`^${prefix}-(\\d+)$`)
-  for (const id of allIds) {
-    const m = id.match(re)
-    if (m) max = Math.max(max, parseInt(m[1], 10))
-  }
-  return `${prefix}-${max + 1}`
+  return _generateId(prefix, allDocIds(doc))
 }
 
 interface Props {

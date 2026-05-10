@@ -1,28 +1,28 @@
 import type { MapDocument } from '../types'
+import { generateId } from './generateId'
 
 export function migrateToSequentialIds(doc: MapDocument): MapDocument {
   const idMap = new Map<string, string>()
+  const assigned = new Set<string>()
 
-  // Assign new waypoint IDs: wp-1, wp-2, …
-  const newWaypoints = doc.waypoints.map((wp, i) => {
-    const newId = `wp-${i + 1}`
+  const newWaypoints = doc.waypoints.map(wp => {
+    const newId = generateId('wp', assigned)
+    assigned.add(newId)
     idMap.set(wp.id, newId)
     return { ...wp, id: newId }
   })
 
-  // Assign new edge IDs: edge-1, edge-2, …
-  const newEdges = doc.edges.map((e, i) => {
-    const newId = `edge-${i + 1}`
+  const newEdges = doc.edges.map(e => {
+    const newId = generateId('edge', assigned)
+    assigned.add(newId)
     idMap.set(e.id, newId)
     return { ...e, id: newId }
   })
 
-  // Assign new POI IDs grouped by type prefix; combo POIs use 'poi-'
-  const typeCounters: Record<string, number> = {}
   const newPois = doc.pois.map(p => {
     const prefix = p.memberPois?.length ? 'poi' : p.type
-    typeCounters[prefix] = (typeCounters[prefix] ?? 0) + 1
-    const newId = `${prefix}-${typeCounters[prefix]}`
+    const newId = generateId(prefix, assigned)
+    assigned.add(newId)
     idMap.set(p.id, newId)
     return { ...p, id: newId }
   })
