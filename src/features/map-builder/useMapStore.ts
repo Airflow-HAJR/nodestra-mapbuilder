@@ -1,5 +1,5 @@
 import { useImmerReducer } from 'use-immer'
-import type { EditorState, MapDocument, Waypoint, Edge, POI, Tool, NodeType, EdgeType } from './types'
+import type { EditorState, MapDocument, Waypoint, Edge, POI, MemberPoiSnapshot, Tool, NodeType, EdgeType } from './types'
 import { EDGE_STYLES, PORTAL_NODE_TYPES } from './types'
 import { findNearestEdge, waypointIdFromProjection } from './utils/projection'
 import { mapTreeActions } from './useMapTreeStore'
@@ -57,6 +57,8 @@ type Action =
   | { type: 'MOVE_POI'; id: string; x: number; y: number }
   | { type: 'UPDATE_POI'; id: string; patch: Partial<POI> }
   | { type: 'DELETE_POI'; id: string }
+  | { type: 'MERGE_POIS'; poiIds: string[] }
+  | { type: 'UNMERGE_POI'; comboPoiId: string }
   // Image & floor
   | { type: 'SET_IMAGE_URL'; url: string | null; fromLoad?: boolean }
   | { type: 'SET_PIXELS_PER_METER'; ppm: number }
@@ -166,6 +168,17 @@ function reducer(state: EditorState, action: Action) {
             x: typeof poi.x === 'number' ? poi.x : 0,
             y: typeof poi.y === 'number' ? poi.y : 0,
             floor: typeof poi.floor === 'number' ? poi.floor : defaults.activeFloor,
+            memberPois: Array.isArray(poi.memberPois)
+              ? (poi.memberPois as Partial<MemberPoiSnapshot>[]).map(m => ({
+                  id: typeof m.id === 'string' ? m.id : crypto.randomUUID(),
+                  type: (m.type ?? 'gate') as NodeType,
+                  name: typeof m.name === 'string' ? m.name : '',
+                  keywords: Array.isArray(m.keywords) ? m.keywords : [],
+                  x: typeof m.x === 'number' ? m.x : 0,
+                  y: typeof m.y === 'number' ? m.y : 0,
+                  floor: typeof m.floor === 'number' ? m.floor : defaults.activeFloor,
+                }))
+              : undefined,
           }))
         : defaults.pois
 
@@ -496,6 +509,84 @@ function reducer(state: EditorState, action: Action) {
           mapTreeActions.unlinkPortalAcrossMaps(action.id, activeMapId)
         }
       }
+      break
+    }
+
+    case 'MERGE_POIS': {
+      const { poiIds } = action
+      if (poiIds.length < 2) break
+      const members = poiIds.map(id => state.doc.pois.find(p => p.id === id)).filter(Boolean) as POI[]
+      if (members.length < 2) break
+
+      commitDoc(state, 'Merge POIs')
+
+      const cx = members.reduce((sum, p) => sum + p.x, 0) / members.length
+      const cy = members.reduce((sum, p) => sum + p.y, 0) / members.length
+      const avgT = members.reduce((sum, p) => sum + (p.projectedT ?? 0), 0) / members.length
+      const first = members[0]
+
+      const sharedEdge = state.doc.edges.find(e => e.id === first.projectedEdgeId)
+      const waypointId = sharedEdge
+        ? (avgT < 0.5 ? sharedEdge.from : sharedEdge.to)
+        : null
+
+      const comboPoi: POI = {
+        id: `poi-${crypto.randomUUID()}`,
+        type: first.type,
+        name: '',
+        keywords: [],
+        waypointId,
+        projectedEdgeId: first.projectedEdgeId,
+        projectedT: avgT,
+        linkedPortalIds: [],
+        x: cx,
+        y: cy,
+        floor: first.floor,
+        memberPois: members.map(p => ({
+          id: p.id,
+          type: p.type,
+          name: p.name,
+          keywords: [...p.keywords],
+          x: p.x,
+          y: p.y,
+          floor: p.floor,
+        })),
+      }
+
+      state.doc.pois = state.doc.pois.filter(p => !poiIds.includes(p.id))
+      state.doc.pois.push(comboPoi)
+      state.selectedId = comboPoi.id
+      state.selectedType = 'poi'
+      break
+    }
+
+    case 'UNMERGE_POI': {
+      const combo = state.doc.pois.find(p => p.id === action.comboPoiId)
+      if (!combo?.memberPois?.length) break
+
+      commitDoc(state, 'Unmerge POIs')
+
+      const restored: POI[] = combo.memberPois.map(m => {
+        const result = findNearestEdge(m.x, m.y, state.doc.edges, state.doc.waypoints, m.floor)
+        return {
+          id: m.id,
+          type: m.type,
+          name: m.name,
+          keywords: [...m.keywords],
+          waypointId: result ? waypointIdFromProjection(result, state.doc.edges) : null,
+          projectedEdgeId: result?.edgeId ?? null,
+          projectedT: result?.t ?? null,
+          linkedPortalIds: [],
+          x: m.x,
+          y: m.y,
+          floor: m.floor,
+        }
+      })
+
+      state.doc.pois = state.doc.pois.filter(p => p.id !== action.comboPoiId)
+      for (const p of restored) state.doc.pois.push(p)
+      state.selectedId = null
+      state.selectedType = null
       break
     }
 

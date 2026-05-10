@@ -15,8 +15,25 @@ export function buildExportPayload(doc: MapDocument) {
   const wpMap = new Map(doc.waypoints.map(w => [w.id, w]))
   const edgeMap = new Map(doc.edges.map(e => [e.id, e]))
 
+  // ── Expand combo POIs into their individual members ──────────────────
+  const flatPois = doc.pois.flatMap(p => {
+    if (!p.memberPois?.length) return [p]
+    return p.memberPois.map(m => ({
+      ...p,
+      id: m.id,
+      type: m.type,
+      name: m.name,
+      keywords: m.keywords,
+      x: m.x,
+      y: m.y,
+      floor: m.floor,
+      linkedPortalIds: [],
+      memberPois: undefined,
+    }))
+  })
+
   // ── Compute projected coords for every POI ───────────────────────────
-  const poisWithCoords = doc.pois.map(p => {
+  const poisWithCoords = flatPois.map(p => {
     let projectedX: number | null = null
     let projectedY: number | null = null
     if (p.projectedEdgeId && p.projectedT !== null) {

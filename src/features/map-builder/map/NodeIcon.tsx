@@ -296,6 +296,8 @@ export function NodeIcon({
   // Inverse scale so POIs stay visually consistent across zoom levels
   const inverseScale = 1 / zoomScale
 
+  const isCombo = poi.memberPois && poi.memberPois.length > 0
+
   return (
     <div
       className={`node-icon-wrapper${isJustPlaced ? ' just-placed' : ''}`}
@@ -305,6 +307,68 @@ export function NodeIcon({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {isCombo && (() => {
+        const members = poi.memberPois!
+        const displayed = members.slice(0, 3)
+        const overflow = members.length - displayed.length
+        const comboBaseSize = 40
+        const comboSize = Math.round(comboBaseSize * sizeScale)
+        const iconSize = Math.round(comboSize * 0.5)
+        return (
+          <>
+            {(hovered || selected) && (
+              <div className="node-tooltip">
+                <div className="node-tooltip-name">Combo POI ({members.length})</div>
+                <div className="node-tooltip-type">{members.map(m => NODE_TYPE_LABELS[m.type]).join(', ')}</div>
+              </div>
+            )}
+            <div
+              className={`node-badge-combo${selected ? ' selected' : ''}`}
+              style={{
+                boxShadow: shadow,
+                gap: `${Math.round(3 * sizeScale)}px`,
+                padding: `${Math.round(4 * sizeScale)}px ${Math.round(6 * sizeScale)}px`,
+              }}
+            >
+              {displayed.map(m => {
+                const { bg: mBg, text: mText } = NODE_COLORS[m.type] ?? NODE_COLORS['gate']
+                return (
+                  <div
+                    key={m.id}
+                    className="node-badge-combo-item"
+                    style={{
+                      background: mBg,
+                      color: mText,
+                      width: `${comboSize}px`,
+                      height: `${comboSize}px`,
+                      borderRadius: `${Math.round(comboSize * 0.23)}px`,
+                    }}
+                  >
+                    <NodeSVGIcon type={m.type} size={iconSize} />
+                  </div>
+                )
+              })}
+              {overflow > 0 && (
+                <div
+                  className="node-badge-combo-overflow"
+                  style={{ fontSize: `${Math.round(11 * sizeScale)}px` }}
+                >
+                  +{overflow}
+                </div>
+              )}
+            </div>
+            {isUnlinked && (
+              <div style={{
+                position: 'absolute', top: -3, right: -3,
+                width: 8, height: 8, borderRadius: '50%',
+                background: '#ef4444', border: '1.5px solid white',
+              }} />
+            )}
+          </>
+        )
+      })()}
+
+      {!isCombo && (<>
       {/* Tooltip — hover or selected */}
       {(hovered || selected) && (
         <div className="node-tooltip">
@@ -391,6 +455,7 @@ export function NodeIcon({
           background: '#ef4444', border: '1.5px solid white',
         }} />
       )}
+      </>)}
     </div>
   )
 }

@@ -4282,3 +4282,187 @@
     border-color: #d97706;
     color: #78350f;
 }
+
+/* ── Combo POI badge ────────────────────────────────────────────────────── */
+
+.node-badge-combo {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    background: #1f2937;
+    transition:
+        transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.15s;
+    cursor: pointer;
+    user-select: none;
+}
+
+.node-badge-combo:hover {
+    transform: translateY(-2px) scale(1.08);
+}
+
+.node-badge-combo.selected {
+    transform: translateY(-2px) scale(1.08);
+}
+
+.node-badge-combo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.node-badge-combo-overflow {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0 3px;
+    flex-shrink: 0;
+}
+
+/* ── Nearby POIs / Combo merge UI ───────────────────────────────────────── */
+
+.map-combo-radius-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.map-combo-radius-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.map-combo-radius-slider {
+    flex: 1;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.map-combo-radius-val {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.map-combo-empty {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 0;
+}
+
+.map-combo-poi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.map-combo-poi-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.1s;
+}
+
+.map-combo-poi-row:hover {
+    background: var(--bg-elevated);
+}
+
+.map-combo-poi-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-combo-poi-type {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.map-props-merge-btn {
+    margin-top: 4px;
+    width: 100%;
+    padding: 7px 12px;
+    border-radius: 7px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s;
+}
+
+.map-props-merge-btn:hover:not(:disabled) {
+    opacity: 0.88;
+}
+
+.map-props-merge-btn:disabled {
+    opacity: 0.38;
+    cursor: default;
+}
+
+.map-props-unmerge-btn {
+    margin-top: 4px;
+    width: 100%;
+    padding: 7px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.map-props-unmerge-btn:hover {
+    background: var(--bg-hover);
+}
+
+.map-combo-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.map-combo-member-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 4px 0;
+}
+
+.map-combo-member-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.map-combo-member-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-combo-member-type {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
