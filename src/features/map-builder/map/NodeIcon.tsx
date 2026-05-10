@@ -50,6 +50,7 @@ const NODE_SIZE: Record<NodeType, number> = {
   restroom:    39,
   'nursing-room': 42,
   'baby-changing-station': 42,
+  'animal-relief': 42,
   'shower-facility': 36,
   'medical-clinic': 36,
   aed:         36,
@@ -228,6 +229,7 @@ export function NodeSVGIcon({ type, size }: { type: NodeType; size: number }) {
     case 'moving-walkway-station': return <Icon size={size}><path d="M2 12h20M5 9l-2 3 2 3M19 9l2 3-2 3" /></Icon>
     case 'nursing-room': return <Icon size={size}><rect x="5" y="5" width="14" height="14" rx="2" /><path d="M12 8v8M8 12h8" /></Icon>
     case 'baby-changing-station': return <Icon size={size}><rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M12 13h4.5l2 2H13z" /></Icon>
+    case 'animal-relief': return <Icon size={size}><circle cx="8" cy="9" r="2.1" /><circle cx="13" cy="7.5" r="1.8" /><circle cx="16.5" cy="10" r="1.7" /><circle cx="11.5" cy="11.5" r="1.7" /><path d="M6.8 16c0-2 1.6-3.5 3.7-3.5h2.2c2.1 0 3.7 1.5 3.7 3.5v1.5H6.8z" /></Icon>
     case 'shower-facility': return <Icon size={size}><circle cx="7" cy="7" r="1" /><circle cx="12" cy="7" r="1" /><circle cx="17" cy="7" r="1" /><path d="M10 12h4v8h-4z" /></Icon>
     case 'medical-clinic': return <Icon size={size}><rect x="4" y="5" width="16" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></Icon>
     case 'oversized-baggage': return <Icon size={size}><rect x="2" y="8" width="20" height="12" rx="2" /><path d="M7 8V6h10v2" /></Icon>
