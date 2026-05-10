@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import type { CSSProperties } from 'react'
 import { animated, useSpring, useTransition } from '@react-spring/web'
 import { ChevronDown, CircleDot, Footprints, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { EditorState, NodeType, POI, MapDocument, Waypoint, Edge } from '../types'
 import { NODE_TYPE_LABELS, NODE_COLORS, EDGE_TYPE_LABELS, EDGE_STYLES, PORTAL_NODE_TYPES } from '../types'
+import { findMergeablePOIs } from '../utils/comboPoi'
 import type { MapDispatch } from '../useMapStore'
 import { mapTreeActions, type CrossMapPortal } from '../useMapTreeStore'
 import { supabase } from '../../../lib/supabase'
@@ -639,7 +640,108 @@ function POIInspector({ poi, doc, dispatch, onClose }: { poi: POI; doc: MapDocum
           </div>
         </div>
       </div>
+
+      <div className="map-props-divider" />
+
+      <NearbyPOIsSection poi={poi} doc={doc} dispatch={dispatch} />
     </>
+  )
+}
+
+// ── Nearby POIs / Combo POI ─────────────────────────────────────────────────
+
+function NearbyPOIsSection({ poi, doc, dispatch }: { poi: POI; doc: MapDocument; dispatch: MapDispatch }) {
+  const isCombo = poi.memberPois && poi.memberPois.length > 0
+  const [radiusT, setRadiusT] = useState(0.10)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => { setSelectedIds(new Set()) }, [poi.id])
+
+  const mergeablePOIs = useMemo(() => {
+    if (isCombo || !poi.projectedEdgeId) return []
+    return findMergeablePOIs(poi, doc.pois, doc.edges, doc.waypoints, radiusT)
+  }, [isCombo, poi, doc.pois, doc.edges, doc.waypoints, radiusT])
+
+  useEffect(() => {
+    const valid = new Set(mergeablePOIs.map(p => p.id))
+    setSelectedIds(prev => {
+      const next = new Set([...prev].filter(id => valid.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [mergeablePOIs])
+
+  if (!poi.projectedEdgeId) return null
+
+  if (isCombo) {
+    return (
+      <div className="map-props-field">
+        <label>Combo Members ({poi.memberPois!.length})</label>
+        <div className="map-combo-members-list">
+          {poi.memberPois!.map(m => {
+            const { bg } = NODE_COLORS[m.type] ?? NODE_COLORS['gate']
+            return (
+              <div key={m.id} className="map-combo-member-row">
+                <div className="map-combo-member-dot" style={{ background: bg }} />
+                <span className="map-combo-member-name">{m.name || NODE_TYPE_LABELS[m.type]}</span>
+                <span className="map-combo-member-type">{NODE_TYPE_LABELS[m.type]}</span>
+              </div>
+            )
+          })}
+        </div>
+        <button
+          className="map-props-unmerge-btn"
+          onClick={() => dispatch({ type: 'UNMERGE_POI', comboPoiId: poi.id })}
+        >
+          Unmerge
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="map-props-field">
+      <label>Nearby POIs</label>
+      <div className="map-combo-radius-row">
+        <span className="map-combo-radius-label">Radius</span>
+        <input
+          type="range" min={0.01} max={0.5} step={0.01}
+          value={radiusT}
+          onChange={e => setRadiusT(Number(e.target.value))}
+          className="map-combo-radius-slider"
+        />
+        <span className="map-combo-radius-val">{Math.round(radiusT * 100)}%</span>
+      </div>
+      {mergeablePOIs.length === 0 ? (
+        <div className="map-combo-empty">No nearby POIs on same side</div>
+      ) : (
+        <>
+          <div className="map-combo-poi-list">
+            {mergeablePOIs.map(p => (
+              <label key={p.id} className="map-combo-poi-row">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(p.id)}
+                  onChange={e => setSelectedIds(prev => {
+                    const next = new Set(prev)
+                    e.target.checked ? next.add(p.id) : next.delete(p.id)
+                    return next
+                  })}
+                />
+                <span className="map-combo-poi-name">{p.name || NODE_TYPE_LABELS[p.type]}</span>
+                <span className="map-combo-poi-type">{NODE_TYPE_LABELS[p.type]}</span>
+              </label>
+            ))}
+          </div>
+          <button
+            className="map-props-merge-btn"
+            disabled={selectedIds.size === 0}
+            onClick={() => dispatch({ type: 'MERGE_POIS', poiIds: [poi.id, ...selectedIds] })}
+          >
+            Merge into Combo POI
+          </button>
+        </>
+      )}
+    </div>
   )
 }
 

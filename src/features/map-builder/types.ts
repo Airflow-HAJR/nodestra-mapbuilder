@@ -61,6 +61,16 @@ export interface Edge {
 /** Portal node types — cross-level transit POIs */
 export const PORTAL_NODE_TYPES: NodeType[] = ['elevator', 'escalator', 'stairs', 'ramp', 'shuttle']
 
+export interface MemberPoiSnapshot {
+  id: string
+  type: NodeType
+  name: string
+  keywords: string[]
+  x: number
+  y: number
+  floor: number
+}
+
 export interface POI {
   id: string
   type: NodeType
@@ -73,6 +83,7 @@ export interface POI {
   x: number   // own render position
   y: number
   floor: number
+  memberPois?: MemberPoiSnapshot[]  // non-empty = this is a combo POI
 }
 
 export interface MapDocument {
