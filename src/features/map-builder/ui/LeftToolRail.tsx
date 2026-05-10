@@ -12,7 +12,7 @@ const POI_CATEGORIES: { label: string; types: NodeType[] }[] = [
   { label: 'Dining & Retail', types: ['restaurant', 'cafe', 'bar', 'shop', 'duty-free', 'bookstore'] },
   { label: 'Services', types: ['lounge', 'customer-service', 'info-desk', 'hotel-desk', 'car-rental'] },
   { label: 'Food & Beverage', types: ['food-court', 'vending', 'water-fountain'] },
-  { label: 'Health & Wellness', types: ['restroom', 'nursing-room', 'baby-changing-station', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy'] },
+  { label: 'Health & Wellness', types: ['restroom', 'nursing-room', 'baby-changing-station', 'animal-relief', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy'] },
   { label: 'Amenities', types: ['charging-station', 'atm', 'currency-exchange', 'telephone', 'business-center', 'seating-area', 'smoking-room', 'prayer-room', 'meditation-room', 'lost-found', 'mail-drop'] },
   { label: 'Movement', types: ['tram-station', 'train-platform', 'moving-walkway-station'] },
   { label: 'Security', types: ['security', 'customs', 'immigration', 'precheck'] },
@@ -456,6 +456,7 @@ function RailContext({ kicker, title, subtitle }: { kicker: string; title: strin
 export function LeftToolRail({ activeTool, activeNodeType, activeEdgeType, dispatch }: Props) {
   const expanded = activeTool === 'add-poi' || activeTool === 'draw-edge'
   const [searchQuery, setSearchQuery] = useState('')
+  const poiSearchRef = useRef<HTMLInputElement>(null)
 
   const widthSpring = useSpring({
     width: expanded ? 228 : 64,
@@ -476,6 +477,14 @@ export function LeftToolRail({ activeTool, activeNodeType, activeEdgeType, dispa
     ? EDGE_TYPES.filter(type => EDGE_TYPE_LABELS[type].toLowerCase().includes(searchQuery.toLowerCase()))
     : EDGE_TYPES
 
+  useEffect(() => {
+    if (activeTool !== 'add-poi') return
+    requestAnimationFrame(() => {
+      poiSearchRef.current?.focus()
+      poiSearchRef.current?.select()
+    })
+  }, [activeTool])
+
   return (
     <animated.div
       className="tool-rail"
@@ -493,6 +502,7 @@ export function LeftToolRail({ activeTool, activeNodeType, activeEdgeType, dispa
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <Search size={14} style={{ position: 'absolute', left: '8px', color: 'var(--text-muted)', pointerEvents: 'none' }} />
               <input
+                ref={poiSearchRef}
                 type="text"
                 placeholder="Search POIs..."
                 value={searchQuery}

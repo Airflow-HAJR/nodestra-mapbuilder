@@ -23,7 +23,7 @@ const ALL_TYPES: NodeType[] = [
   // Food & beverage
   'food-court', 'vending', 'water-fountain',
   // Health & wellness
-  'restroom', 'nursing-room', 'baby-changing-station', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy',
+  'restroom', 'nursing-room', 'baby-changing-station', 'animal-relief', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy',
   // Amenities
   'charging-station', 'atm', 'currency-exchange', 'telephone', 'business-center',
   'seating-area', 'smoking-room', 'prayer-room', 'meditation-room', 'lost-found', 'mail-drop',
@@ -974,7 +974,7 @@ async function updateCrossMapLink(target: CrossMapPortal, sourcePoiId: string, a
 
 // ── Layers Button (bottom-right floating) ──────────────────────────────
 
-const POI_TYPES: NodeType[] = ['gate', 'shop', 'restroom', 'baby-changing-station', 'security', 'baggage', 'info-desk', 'exit', 'entrance']
+const POI_TYPES: NodeType[] = ['gate', 'shop', 'restroom', 'baby-changing-station', 'animal-relief', 'security', 'baggage', 'info-desk', 'exit', 'entrance']
 const PORTAL_TYPES: NodeType[] = ['elevator', 'escalator', 'stairs', 'ramp', 'shuttle']
 
 type LayerKey = 'pois' | 'movement' | 'portals'
