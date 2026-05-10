@@ -531,9 +531,9 @@ function AuthenticatedMapBuilder({ user }: { user: User }) {
       <Dialog open={migrateIdsOpen} onOpenChange={setMigrateIdsOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Migrate to Sequential IDs</DialogTitle>
+            <DialogTitle>Migrate to Alphanumeric IDs</DialogTitle>
             <DialogDescription>
-              This will renumber all {state.doc.waypoints.length} waypoints, {state.doc.edges.length} edges, and {state.doc.pois.length} POIs to friendly IDs like <strong>gate-1</strong>, <strong>wp-2</strong>, <strong>edge-3</strong>. All internal references will be updated. This action can be undone with <strong>Ctrl+Z</strong>.
+              This will renumber all {state.doc.waypoints.length} waypoints, {state.doc.edges.length} edges, and {state.doc.pois.length} POIs to friendly IDs like <strong>gate-A3F2</strong>, <strong>wp-X9K1</strong>, <strong>edge-M2P4</strong>. All internal references will be updated. This action can be undone with <strong>Ctrl+Z</strong>.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
