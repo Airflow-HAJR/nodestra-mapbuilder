@@ -6,7 +6,7 @@ import { NodeSVGIcon } from '../map/NodeIcon'
 // Most common POI types for quick access in floating toolbar (use LeftToolRail for full list)
 const POI_TYPES: NodeType[] = [
   'gate', 'exit', 'entrance',
-  'baggage', 'restroom', 'security',
+  'baggage', 'restroom', 'baby-changing-station', 'security',
   'escalator', 'elevator', 'stairs',
   'shop', 'lounge', 'info-desk',
 ]

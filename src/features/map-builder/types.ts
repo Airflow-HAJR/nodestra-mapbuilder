@@ -10,7 +10,7 @@ export type NodeType =
   // Food & beverage
   | 'food-court' | 'vending' | 'water-fountain'
   // Health & wellness
-  | 'restroom' | 'nursing-room' | 'shower-facility'
+  | 'restroom' | 'nursing-room' | 'baby-changing-station' | 'shower-facility'
   | 'medical-clinic' | 'aed' | 'pharmacy'
   // Amenities
   | 'charging-station' | 'atm' | 'currency-exchange' | 'telephone' | 'business-center'
@@ -133,6 +133,7 @@ export const NODE_TYPE_LABELS: Record<NodeType, string> = {
   // Health & wellness
   restroom:    'Restroom',
   'nursing-room': 'Nursing Room',
+  'baby-changing-station': 'Baby Changing Station',
   'shower-facility': 'Shower',
   'medical-clinic': 'Medical Clinic',
   aed:         'AED',
@@ -207,6 +208,7 @@ export const NODE_COLORS: Record<NodeType, { bg: string; text: string }> = {
   // Health & wellness
   restroom:    { bg: '#374151', text: '#ffffff' },
   'nursing-room': { bg: '#db2777', text: '#ffffff' },
+  'baby-changing-station': { bg: '#ec4899', text: '#ffffff' },
   'shower-facility': { bg: '#06b6d4', text: '#ffffff' },
   'medical-clinic': { bg: '#dc2626', text: '#ffffff' },
   aed:         { bg: '#dc2626', text: '#ffffff' },
@@ -281,6 +283,7 @@ export const NODE_GLYPHS: Record<NodeType, string> = {
   // Health & wellness
   restroom:    'WC',
   'nursing-room': '🍼',
+  'baby-changing-station': '👶',
   'shower-facility': '🚿',
   'medical-clinic': '⊕',
   aed:         'AED',
