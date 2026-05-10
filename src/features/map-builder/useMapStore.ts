@@ -3,6 +3,7 @@ import type { EditorState, MapDocument, Waypoint, Edge, POI, MemberPoiSnapshot, 
 import { EDGE_STYLES, PORTAL_NODE_TYPES } from './types'
 import { findNearestEdge, waypointIdFromProjection } from './utils/projection'
 import { mapTreeActions } from './useMapTreeStore'
+import { migrateToSequentialIds } from './utils/migrateIds'
 
 const UNDO_LIMIT = 100
 
@@ -81,6 +82,8 @@ type Action =
   | { type: 'SET_SAVED' }
   // Clear all
   | { type: 'CLEAR_ALL' }
+  // Migrate
+  | { type: 'MIGRATE_IDS' }
   // Undo / Redo
   | { type: 'UNDO' }
   | { type: 'REDO' }
@@ -658,6 +661,17 @@ function reducer(state: EditorState, action: Action) {
       state.selectedType = null
       state.edgeSource = null
       state.previewHighlightEdgeId = null
+      break
+    }
+
+    case 'MIGRATE_IDS': {
+      commitDoc(state, 'Migrate IDs')
+      const migrated = migrateToSequentialIds(state.doc)
+      state.doc.waypoints = migrated.waypoints
+      state.doc.edges = migrated.edges
+      state.doc.pois = migrated.pois
+      state.selectedId = null
+      state.selectedType = null
       break
     }
 

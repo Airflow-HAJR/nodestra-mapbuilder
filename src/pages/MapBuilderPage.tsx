@@ -95,6 +95,7 @@ function AuthenticatedMapBuilder({ user }: { user: User }) {
   const [imageScale, setImageScale] = useState<number>(1);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [clearAllOpen, setClearAllOpen] = useState(false);
+  const [migrateIdsOpen, setMigrateIdsOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [isDuplicateWarningDismissed, setIsDuplicateWarningDismissed] = useState(false);
   const [addPOIMenuPos, setAddPOIMenuPos] = useState<{ screenX: number; screenY: number } | null>(null);
@@ -334,6 +335,7 @@ function AuthenticatedMapBuilder({ user }: { user: User }) {
         isUploadingImage={isUploadingImage}
         onSave={save}
         onExport={exportJson}
+        onMigrateIds={() => setMigrateIdsOpen(true)}
         onClearAll={() => setClearAllOpen(true)}
       />
 
@@ -520,6 +522,34 @@ function AuthenticatedMapBuilder({ user }: { user: User }) {
               }}
             >
               Upload
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={migrateIdsOpen} onOpenChange={setMigrateIdsOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Migrate to Sequential IDs</DialogTitle>
+            <DialogDescription>
+              This will renumber all {state.doc.waypoints.length} waypoints, {state.doc.edges.length} edges, and {state.doc.pois.length} POIs to friendly IDs like <strong>gate-1</strong>, <strong>wp-2</strong>, <strong>edge-3</strong>. All internal references will be updated. This action can be undone with <strong>Ctrl+Z</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              className="editor-topbar-btn"
+              onClick={() => setMigrateIdsOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="editor-topbar-btn accent"
+              onClick={() => {
+                dispatch({ type: 'MIGRATE_IDS' });
+                setMigrateIdsOpen(false);
+              }}
+            >
+              Migrate IDs
             </button>
           </DialogFooter>
         </DialogContent>

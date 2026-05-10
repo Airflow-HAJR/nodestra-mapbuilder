@@ -9,6 +9,7 @@ interface Props {
   onSave: () => void
   onExport: () => void
   onClearAll: () => void
+  onMigrateIds: () => void
 }
 
 const STATUS_MAP: Record<string, { color: string; label: string }> = {
@@ -21,7 +22,7 @@ const STATUS_MAP: Record<string, { color: string; label: string }> = {
 
 export function TopBar({
   doc, saveStatus, saveError, isDirty, isUploadingImage,
-  onSave, onExport, onClearAll,
+  onSave, onExport, onClearAll, onMigrateIds,
 }: Props) {
   const status = isUploadingImage ? 'uploading'
     : saveStatus === 'saving' ? 'saving'
@@ -60,6 +61,9 @@ export function TopBar({
           <span className="editor-action-divider" />
           <button className="editor-topbar-btn ghost" onClick={onExport}>
             Export
+          </button>
+          <button className="editor-topbar-btn ghost" onClick={onMigrateIds}>
+            Migrate IDs
           </button>
           <button className="editor-topbar-btn ghost" onClick={onClearAll}>
             Clear All
