@@ -12,7 +12,7 @@ const POI_CATEGORIES: { label: string; types: NodeType[] }[] = [
   { label: 'Dining & Retail', types: ['restaurant', 'cafe', 'bar', 'shop', 'duty-free', 'bookstore'] },
   { label: 'Services', types: ['lounge', 'customer-service', 'info-desk', 'hotel-desk', 'car-rental'] },
   { label: 'Food & Beverage', types: ['food-court', 'vending', 'water-fountain'] },
-  { label: 'Health & Wellness', types: ['restroom', 'nursing-room', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy'] },
+  { label: 'Health & Wellness', types: ['restroom', 'nursing-room', 'baby-changing-station', 'shower-facility', 'medical-clinic', 'aed', 'pharmacy'] },
   { label: 'Amenities', types: ['charging-station', 'atm', 'currency-exchange', 'telephone', 'business-center', 'seating-area', 'smoking-room', 'prayer-room', 'meditation-room', 'lost-found', 'mail-drop'] },
   { label: 'Movement', types: ['tram-station', 'train-platform', 'moving-walkway-station'] },
   { label: 'Security', types: ['security', 'customs', 'immigration', 'precheck'] },
